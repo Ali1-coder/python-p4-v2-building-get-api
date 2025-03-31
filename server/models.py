@@ -14,7 +14,7 @@ metadata = MetaData(
 db = SQLAlchemy(metadata=metadata)
 
 
-class Game(db.Model):
+class Game(db.Model,SerializerMixin):
     __tablename__ = "games"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -24,6 +24,8 @@ class Game(db.Model):
     price = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
+
+    serializer_rules=('-reviews.game')
 
     reviews = db.relationship("Review", back_populates="game")
 
@@ -46,6 +48,8 @@ class Review(db.Model):
     game = db.relationship("Game", back_populates="reviews")
     user = db.relationship("User", back_populates="reviews")
 
+    serializer_rules=('-game.reviews','-user.reviews',)
+
     def __repr__(self):
         return f"<Review ({self.id}) of {self.game}: {self.score}/10>"
 
@@ -60,6 +64,8 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
     reviews = db.relationship("Review", back_populates="user")
+
+    serializer_rules=('-reviews.user')
 
     def __repr__(self):
         return f"<User ({self.id}) {self.name}>"
