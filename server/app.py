@@ -38,7 +38,18 @@ def game_by_id(id):
     return response
 
 
+@app.route('/games/users/<int:id>')
+def game_users_by_id(id):
+    game = Game.query.filter(Game.id == id).first()
+    users = [review.user.to_dict(rules=("-reviews",)) for review in game.reviews]
+    
 
+    response = make_response(
+        users,
+        200
+    )
+
+    return response
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
